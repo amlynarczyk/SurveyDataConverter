@@ -76,7 +76,8 @@ http://opendatacommons.org/licenses/by/1.0/"""
         wildcard = "Supported files (%s)|%s" % (
         file_types_string, file_types_string)
 
-        self.SetMinClientSize(wx.Size(400, -1))
+        if hasattr(self, 'SetMinClientSize'):
+            self.SetMinClientSize(wx.Size(400, -1))
 
         self._panel = wx.Panel(self)
 

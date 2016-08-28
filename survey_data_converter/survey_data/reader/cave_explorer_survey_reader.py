@@ -86,6 +86,7 @@ class CaveExplorerSurveyReader(SurveyReader):
                     data_line.clino = float(data[4])
                     trip.data.append(data_line)
                     if is_splay:
+                        data_line.type = DataLine.Type.SPLAY
                         trip.splays_count += 1
                     else:
                         trip.shots_count += 1

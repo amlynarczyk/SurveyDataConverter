@@ -134,6 +134,7 @@ class PocketTopoSurveyReader(SurveyReader):
                     trip = self._trip_with_name(trip_name)
                     if trip is not None:
                         if is_splay:
+                            data_line.type = DataLine.Type.SPLAY
                             trip.splays_count += 1
                         elif data_line != trip.last_dataline:
                             trip.shots_count += 1

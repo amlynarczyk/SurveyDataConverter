@@ -63,6 +63,10 @@ class PocketTopoTopReader(SurveyReader):
             trip = Trip()
             if 'comment' in rtrip and rtrip['comment']:
                 trip.comment = rtrip['comment'].strip()
+                if trip.comment.startswith('{'):
+                    index = trip.comment.find('}')
+                    if index > 0:
+                        trip.comment = trip.comment[(index+1):]
             if 'date' in rtrip and rtrip['date']:
                 trip.date = datetime.datetime.fromtimestamp(time.mktime(rtrip['date']))
             if 'dec' in rtrip and rtrip['dec']:
@@ -85,9 +89,13 @@ class PocketTopoTopReader(SurveyReader):
                 data_line.tape = round(rshoot['tape'], 3)
             if 'comment' in rshoot:
                 data_line.comment = rshoot['comment']
+            if 'rollangle' in rshoot:
+                data_line.comment += " Roll: %.1f " % (rshoot['rollangle'])
+            data_line.comment = data_line.comment.strip()
             is_splay = not data_line.toSt
             if is_splay:
                 trip.splays_count += 1
+                data_line.type = DataLine.Type.SPLAY
             elif data_line != trip.last_dataline:
                 trip.shots_count += 1
             trip.data.append(data_line)

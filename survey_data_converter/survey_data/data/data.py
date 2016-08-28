@@ -26,6 +26,11 @@
 
 
 class DataLine(object):
+    class Type:
+        SHOT = 1
+        SPLAY = 2
+        DUPLICATED_SHOT = 3
+
     def __init__(self):
         super(DataLine, self).__init__()
         self.fromSt = ""
@@ -34,6 +39,8 @@ class DataLine(object):
         self.compass = 0
         self.tape = 0
         self.comment = ""
+        self.type = 0
+        self.type = DataLine.Type.SHOT
 
     def __eq__(self, other):
         if type(self) != type(other):
