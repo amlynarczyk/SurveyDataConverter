@@ -45,8 +45,8 @@ def create_build_script():
 
 create_build_script()
 
-sys.path.append("C:\\Windows\\WinSxS\\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.9177_none_5093cc7abcb795e9")
-#data_files = [("Microsoft.VC90.CRT", glob(r'C:\Windows\WinSxS\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.1_none_e163563597edeada\*.*'))]
+sys.path.append("C:\\Windows\\WinSxS\\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.21022.8_none_bcb86ed6ac711f91")
+data_files = [("Microsoft.VC90.CRT", glob(r'C:\Windows\WinSxS\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.21022.8_none_bcb86ed6ac711f91\*.*'))]
 
 PATH = os.path.realpath(os.path.abspath(__file__))
 sys.path.append(os.path.join(os.path.dirname(PATH), "survey_data_converter"))
@@ -57,7 +57,7 @@ setup(
     name = survey_data_converter.info.__appname__,
     author = survey_data_converter.__author__,
     license = survey_data_converter.__license__,
-    #data_files = data_files,
+    data_files = data_files,
     # targets to build
     windows = [{
         'script': 'build\\_scripts\\survey_data_converter',
