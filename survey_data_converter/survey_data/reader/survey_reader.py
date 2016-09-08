@@ -45,6 +45,8 @@ class SurveyReader(object):
         self.survey = Survey()
         self.survey.trips.append(Trip())
         self._read_data(file_path)
+        for trip in self.survey.trips:
+            trip.preprocess_data()
 
     @classmethod
     def can_read_file(cls, file_path):
@@ -56,7 +58,7 @@ class SurveyReader(object):
         supported_files = []
         for reader_class in reader_classes:
             supported_files.append(
-                    [reader_class.file_type(), reader_class.file_extension()])
+                [reader_class.file_type(), reader_class.file_extension()])
         return supported_files
 
     @classmethod

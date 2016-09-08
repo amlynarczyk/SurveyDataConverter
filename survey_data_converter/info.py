@@ -38,7 +38,7 @@ __author__ = 'Arkadiusz Młynarczyk'
 __contact__ = 'arek@mlynarczyk.info'
 __projecturl__ = 'http://github.com/amlynarczyk/SurveyDataConverter'
 
-__appname__ = 'Survery Data Converter'
+__appname__ = 'Survey Data Converter'
 __license__ = 'MIT'
 
 __description__ = 'Converts between several survey data files formats'

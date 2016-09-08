@@ -50,6 +50,11 @@ class MainFrame(wx.Frame):
     LICENSE_TEXT = """This survey data is made available under the Open Data Commons Attribution License:
 http://opendatacommons.org/licenses/by/1.0/"""
 
+    PRECALCULATE_LABEL = "Precalculate average values from duplicated shots."
+    HIDE_PRECALCULATED_LABEL = "Hide duplicated shots used for precalculation."
+    MOVE_SPLAYS_LABEL = "Move splay shots to the end of trip data."
+    SHOW_ROLL_LABEL = "Add DistoX roll value as a comment."
+
     ALERT_UNSUPPORTED_FILE_TYPE_CAPTION = "Unsupported file"
     ALERT_UNSUPPORTED_FILE_TYPE_MESSAGE = "Can't recognize this file as a " \
                                           "survey data, probably it isn't " \
@@ -74,7 +79,7 @@ http://opendatacommons.org/licenses/by/1.0/"""
         file_types_string = file_types_string.strip(';')
 
         wildcard = "Supported files (%s)|%s" % (
-        file_types_string, file_types_string)
+            file_types_string, file_types_string)
 
         if hasattr(self, 'SetMinClientSize'):
             self.SetMinClientSize(wx.Size(400, -1))
@@ -108,6 +113,24 @@ http://opendatacommons.org/licenses/by/1.0/"""
                                               name="LicenseText")
         self._license_textfield.SetValue(self.LICENSE_TEXT)
 
+        self._advanced_options_panel = wx.CollapsiblePane(self._panel, label="Advanced Options:",
+                                                          style=wx.CP_DEFAULT_STYLE | wx.CP_NO_TLW_RESIZE,
+                                                          name="AdvancedOptions")
+        collapsible_panel = self._advanced_options_panel.GetPane()
+        self._precalculate_checkbox = wx.CheckBox(collapsible_panel, style=wx.CHK_2STATE,
+                                                  label=self.PRECALCULATE_LABEL,
+                                                  name="Precalculate")
+        self._hide_precalculate_checkbox = wx.CheckBox(collapsible_panel, style=wx.CHK_2STATE,
+                                                       label=self.HIDE_PRECALCULATED_LABEL,
+                                                       name="HidePrecalculate")
+        self._move_splays_checkbox = wx.CheckBox(collapsible_panel, style=wx.CHK_2STATE,
+                                                 label=self.MOVE_SPLAYS_LABEL,
+                                                 name="MoveSplays")
+        self._show_roll_checkbox = wx.CheckBox(collapsible_panel, style=wx.CHK_2STATE,
+                                               label=self.SHOW_ROLL_LABEL,
+                                               name="ShowRoll")
+        self._advanced_options_panel.Bind(wx.EVT_COLLAPSIBLEPANE_CHANGED, self._on_panel)
+
         self._save_button = wx.Button(self._panel, label="Save")
         self._save_button.Bind(wx.EVT_BUTTON, self._on_save)
 
@@ -132,11 +155,20 @@ http://opendatacommons.org/licenses/by/1.0/"""
         mgr.RegisterAndRestore(self._writers_panel)
         mgr.RegisterAndRestore(self._license_checkbox)
         mgr.RegisterAndRestore(self._license_textfield)
+        mgr.RegisterAndRestore(self._advanced_options_panel)
+        mgr.RegisterAndRestore(self._precalculate_checkbox)
+        mgr.RegisterAndRestore(self._hide_precalculate_checkbox)
+        mgr.RegisterAndRestore(self._move_splays_checkbox)
+        mgr.RegisterAndRestore(self._show_roll_checkbox)
         self.Fit()
 
     def _on_exit(self, event):
         mgr = PERSIST.PersistenceManager.Get()
         mgr.SaveAndUnregister()
+        event.Skip()
+
+    def _on_panel(self, event):
+        self.Fit()
         event.Skip()
 
     def _on_save(self, event):
@@ -157,7 +189,10 @@ http://opendatacommons.org/licenses/by/1.0/"""
         if save_file_dialog.ShowModal() == wx.ID_OK:
             footer = "Created with %s v%s (%s)" % (
                 __appname__, __version__, __projecturl__)
-            writer(self._file_reader, save_file_dialog.GetPath(), header,
+            self._file_reader = SurveyReader(self._file_reader.file_path)
+            writer(self._file_reader, save_file_dialog.GetPath(), self._precalculate_checkbox.GetValue(),
+                   self._hide_precalculate_checkbox.GetValue(), self._move_splays_checkbox.GetValue(),
+                   self._show_roll_checkbox.GetValue(), header,
                    footer)
             alert = wx.MessageDialog(self, self.ALERT_FINISHED_MESSAGE,
                                      self.ALERT_FINISHED_CAPTION,
@@ -204,9 +239,21 @@ http://opendatacommons.org/licenses/by/1.0/"""
         vertical_sizer.AddSpacer(5)
         vertical_sizer.Add(self._license_textfield, 0,
                            wx.TOP | wx.BOTTOM | wx.EXPAND, 0)
+
         vertical_sizer.AddSpacer(5)
-        vertical_sizer.Add(wx.StaticLine(self._panel), 0,
-                           wx.TOP | wx.BOTTOM | wx.EXPAND, 10)
+        vertical_sizer.Add(self._advanced_options_panel, 0,
+                           wx.TOP | wx.BOTTOM | wx.EXPAND, 0)
+
+        collapsible_panel = self._advanced_options_panel.GetPane()
+        collapsible_panel_sizer = wx.BoxSizer(wx.VERTICAL)
+        collapsible_panel_sizer.Add(self._precalculate_checkbox, wx.GROW | wx.ALL, 0)
+        collapsible_panel_sizer.Add(self._hide_precalculate_checkbox, wx.GROW | wx.ALL, 0)
+        collapsible_panel_sizer.Add(self._move_splays_checkbox, wx.GROW | wx.ALL, 0)
+        collapsible_panel_sizer.Add(self._show_roll_checkbox, wx.GROW | wx.ALL, 0)
+        collapsible_panel_sizer.Add(wx.StaticLine(collapsible_panel), 0,
+                                    wx.TOP | wx.BOTTOM | wx.EXPAND, 10)
+        collapsible_panel.SetSizer(collapsible_panel_sizer)
+
         vertical_sizer.Add(self._save_button, 0, wx.ALIGN_RIGHT,
                            0)
 

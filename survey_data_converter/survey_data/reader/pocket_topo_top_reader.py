@@ -90,13 +90,7 @@ class PocketTopoTopReader(SurveyReader):
             if 'comment' in rshoot:
                 data_line.comment = rshoot['comment']
             if 'rollangle' in rshoot:
-                data_line.comment += " Roll: %.1f " % (rshoot['rollangle'])
+                data_line.roll = round(rshoot['rollangle'], 1)
             data_line.comment = data_line.comment.strip()
-            is_splay = not data_line.toSt
-            if is_splay:
-                trip.splays_count += 1
-                data_line.type = DataLine.Type.SPLAY
-            elif data_line != trip.last_dataline:
-                trip.shots_count += 1
             trip.data.append(data_line)
         return self.survey

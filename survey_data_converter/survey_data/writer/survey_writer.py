@@ -32,11 +32,21 @@ from ..data import *
 class SurveyWriter(object):
     __metaclass__ = ABCMeta
 
-    def __init__(self, survey_reader, file_path, header, footer = ""):
+    def __init__(self, survey_reader, file_path, precalculate, hide_duplicates, move_splays, show_roll, header, footer = ""):
         super(SurveyWriter, self).__init__()
+        self._precalculate = precalculate
+        self._hide_duplicates = precalculate and hide_duplicates
         self._header = header.strip()
         self._footer = footer.strip()
         self._survey_reader = survey_reader
+
+        if move_splays or show_roll:
+            for trip in self._survey_reader.survey.trips:
+                if move_splays:
+                    trip.move_splays_to_end()
+                if show_roll:
+                    trip.show_rolls()
+
         self._write_data(file_path)
 
     @classmethod

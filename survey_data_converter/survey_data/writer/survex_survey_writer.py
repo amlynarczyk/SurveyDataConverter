@@ -31,9 +31,10 @@ import os
 
 
 class SurvexSurveyWriter(SurveyWriter):
-    def __init__(self, survey_reader, file_path, header, footer=""):
+    def __init__(self, survey_reader, file_path, precalculate, hide_duplicates, move_splays, show_roll, header,
+                 footer=""):
         super(SurvexSurveyWriter, self).__init__(survey_reader, file_path,
-                                                 header, footer)
+                                                 precalculate, hide_duplicates, move_splays, show_roll, header, footer)
 
     @classmethod
     def file_type(cls):
@@ -104,27 +105,41 @@ class SurvexSurveyWriter(SurveyWriter):
             f.write("*data normal from to tape compass clino\n\n")
 
             for data in trip.data:
+                if self._hide_duplicates and data.type == DataLine.Type.DUPLICATED_SHOT:
+                    continue
+                if data.type == DataLine.Type.SPLIT:
+                    f.write("\n\n;Splay shots:\n")
+                    continue
+                if not self._precalculate and data.calculated:
+                    continue
+
                 additional_line = ''
                 fromSt = data.fromSt.replace(".", "_")
                 toSt = data.toSt
-                if not toSt:
+                if data.type == DataLine.Type.SPLAY:
                     toSt = ".."
                 else:
                     toSt = toSt.replace(".", "_")
 
                 prefix = ""
                 if data.tape == 0: prefix = ";"
-                if data.tape == 0 and data.toSt:  prefix = "\n" + prefix;
+                if data.tape == 0 and data.type != DataLine.Type.SPLAY:  prefix = "\n" + prefix
+
+                if self._precalculate and data.type == DataLine.Type.DUPLICATED_SHOT:
+                    prefix = ";"
 
                 f.write(
                     "%s%s\t%s\t%0.3f\t%0.2f\t%0.2f" % (
                         prefix, fromSt, toSt, data.tape, data.compass,
                         data.clino))
 
-                comment = data.comment
+                comment = ""
+                if self._precalculate and data.calculated and self._hide_duplicates:
+                    comment = comment + data.calculated_comment
+                comment = comment + " ;" + data.comment
                 comment = (" ".join(comment.splitlines())).strip()
                 if data.tape == 0:
-                    if data.toSt:
+                    if data.type != DataLine.Type.SPLAY:
                         comment = "Connecting shot; " + comment
                         additional_line = ';*equate %s\t%s\t;Generated automatically\n\n' % (
                             fromSt, toSt)

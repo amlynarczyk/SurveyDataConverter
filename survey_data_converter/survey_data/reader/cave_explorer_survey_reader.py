@@ -51,7 +51,8 @@ class CaveExplorerSurveyReader(SurveyReader):
         first_line = f.readline().strip()
         second_line = f.readline().strip()
         f.close()
-        if first_line == cls.TYPICAL_STRING_1 and (second_line == cls.TYPICAL_STRING_2 or second_line == cls.TYPICAL_STRING_3):
+        if first_line == cls.TYPICAL_STRING_1 and (
+                second_line == cls.TYPICAL_STRING_2 or second_line == cls.TYPICAL_STRING_3):
             return True
         else:
             return False
@@ -74,7 +75,7 @@ class CaveExplorerSurveyReader(SurveyReader):
                 if len(data) == 0:
                     continue
                 if state < 2:
-                    state+=1
+                    state = state + 1
                     continue
                 if state == 2:
                     is_splay = data[1].find(":") != -1
@@ -85,9 +86,3 @@ class CaveExplorerSurveyReader(SurveyReader):
                     data_line.compass = float(data[3])
                     data_line.clino = float(data[4])
                     trip.data.append(data_line)
-                    if is_splay:
-                        data_line.type = DataLine.Type.SPLAY
-                        trip.splays_count += 1
-                    else:
-                        trip.shots_count += 1
-                    continue

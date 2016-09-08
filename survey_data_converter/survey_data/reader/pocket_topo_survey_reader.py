@@ -116,16 +116,16 @@ class PocketTopoSurveyReader(SurveyReader):
                         elif len(data) == 5:
                             if not data[4].startswith("0.0") and data[
                                 4].endswith(
-                                    "0"):
+                                "0"):
                                 data_line.comment = data[4]
                                 non_data_idx = min(non_data_idx, 4)
                     non_data_idx = min(non_data_idx, len(data))
                     if non_data_idx == 5:
                         data_line.toSt = data[1]
                     data_line.fromSt = data[0]
-                    data_line.tape = float(data[non_data_idx - 3].replace(",","."))
-                    data_line.compass = float(data[non_data_idx - 2].replace(",","."))
-                    data_line.clino = float(data[non_data_idx - 1].replace(",","."))
+                    data_line.tape = float(data[non_data_idx - 3].replace(",", "."))
+                    data_line.compass = float(data[non_data_idx - 2].replace(",", "."))
+                    data_line.clino = float(data[non_data_idx - 1].replace(",", "."))
 
                     is_splay = not data_line.toSt
 
@@ -133,11 +133,6 @@ class PocketTopoSurveyReader(SurveyReader):
                         continue
                     trip = self._trip_with_name(trip_name)
                     if trip is not None:
-                        if is_splay:
-                            data_line.type = DataLine.Type.SPLAY
-                            trip.splays_count += 1
-                        elif data_line != trip.last_dataline:
-                            trip.shots_count += 1
                         trip.data.append(data_line)
                     continue
         return self.survey
