@@ -61,7 +61,7 @@ class WallsSurveyWriter(SurveyWriter):
 
 
         f.write(";#PREFIX %s\n" % first_line)
-        f.write("#UNITS D=M A=G V=G Order=DAV\n\n")
+        f.write("#UNITS D=M A=D V=D Order=DAV\n\n")
 
         first_trip = True
         for trip in self._survey_reader.survey.trips:
